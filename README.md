@@ -14,7 +14,7 @@ Clone this repo and install with:
 ```
 conda create --name popvae python=3.7.7
 conda activate popvae
-git clone https://github.com/cjbattey/popvae.git
+git clone https://github.com/tatkeller/popvae.git
 cd popvae
 python setup.py install
 ```
