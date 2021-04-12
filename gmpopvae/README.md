@@ -54,3 +54,9 @@ numpy==1.15.2
 torchvision==0.2.1
 torch==0.4.1.post2
 ```
+
+# POPGMVAE
+
+```
+python run_popgmvae.py --infile data/genomics/popvae/pabu/pabu_test_genotypes.vcf --iter_max 10000
+```
