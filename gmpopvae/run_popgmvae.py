@@ -5,7 +5,7 @@ import tqdm
 from codebase import utils as ut
 from codebase.models.popgmvae import GMVAE
 from codebase.train_pop import train
-from codebase.evaluate import evaluate
+from codebase.evaluate_pop import evaluate
 from pprint import pprint
 from torchvision import datasets, transforms
 import allel
@@ -136,6 +136,10 @@ else:
 # print(trainsamples)
 # print(testsamples)
 
+# print(traingen.shape)
+# print(testgen.shape)
+
+
 batch_size = 4
 
 train_loader = torch.utils.data.DataLoader(traingen,
@@ -143,6 +147,10 @@ train_loader = torch.utils.data.DataLoader(traingen,
                                            num_workers=0)
 
 test_loader = torch.utils.data.DataLoader(testgen,
+                                          batch_size=batch_size, shuffle=True,
+                                          num_workers=0)
+
+full_loader = torch.utils.data.DataLoader(dc,
                                           batch_size=batch_size, shuffle=True,
                                           num_workers=0)
 
@@ -167,8 +175,8 @@ else:
     #writer = ut.prepare_writer(model_name, overwrite_existing=True)
     ut.load_model_by_name(gmvae, global_step=args.iter_max)
     evaluate(model=gmvae,
-             test_loader=test_loader,
-             labeled_subset=labeled_subset,
+             test_loader=full_loader,
+             labeled_subset=None,
              device=device,
              tqdm=tqdm.tqdm,
              iter_max=15,
