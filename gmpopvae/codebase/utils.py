@@ -14,7 +14,7 @@ import matplotlib as mpl
 
 
 bce = torch.nn.BCEWithLogitsLoss(reduction='none')
-
+mse = torch.nn.MSELoss(reduction='none')
 ################################################################################
 # Please familiarize yourself with the code below.
 #
@@ -147,7 +147,7 @@ def log_bernoulli_with_logits(x, logits):
     log_prob = -bce(input=logits, target=x).sum(-1)
     return log_prob
 
-def log_bernoulli_with_logits_sigmoid(x, logits):
+def loss_sigmoid(x, logits):
     """
     Computes the log probability of a Bernoulli given its logits
 
@@ -158,8 +158,8 @@ def log_bernoulli_with_logits_sigmoid(x, logits):
     Return:
         log_prob: tensor: (batch,): log probability of each sample
     """
-    log_prob = -bce(input=logits, target=x).sum(-1)
-    return log_prob
+    prob = -mse(input=logits.float(), target=x.float()).sum(-1)
+    return prob
 
 
 def kl_cat(q, log_q, log_p):

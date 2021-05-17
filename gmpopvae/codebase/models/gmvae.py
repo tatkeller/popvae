@@ -66,7 +66,7 @@ class GMVAE(nn.Module):
         kl = torch.mean(term1 - term2)
 
         # Reconstruction Loss
-        rec = torch.mean(ut.log_bernoulli_with_logits(x,logits))
+        rec = torch.mean(ut.loss_sigmoid(x,logits))
 
         # Negative ELBO definition
         nelbo = kl - rec

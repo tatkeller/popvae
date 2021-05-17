@@ -78,19 +78,19 @@ def evaluate(model, test_loader, labeled_subset, device, tqdm,
             if i == iter_max:
                 break
 
-    # m, v = model.get_priors()
-    # m = m.detach().numpy()[0]
-    # v = v.detach().numpy()[0]
+    m, v = model.get_priors()
+    m = m.detach().numpy()[0]
+    v = v.detach().numpy()[0]
 
-    # pi = model.get_weights()
-    # pi = pi.detach().numpy()
+    pi = model.get_weights()
+    pi = pi.detach().numpy()
 
-    # for k, m_k in enumerate(m):
-    #     ut.draw_ellipse(m_k, v[k] * np.eye(v[k].shape[-1]), alpha = 0.1)
+    for k, m_k in enumerate(m):
+        ut.draw_ellipse(m_k, v[k] * np.eye(v[k].shape[-1]), alpha = 0.1)
 
-    # print(m)
-    # print("-")
-    # print(v)
+    print(m)
+    print("-")
+    print(v)
 
     if samples is not None:
         if cat:
