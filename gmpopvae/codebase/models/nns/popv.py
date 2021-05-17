@@ -6,12 +6,12 @@ from torch import autograd, nn, optim
 from torch.nn import functional as F
 
 class Encoder(nn.Module):
-    def __init__(self, z_dim, y_dim=0):
+    def __init__(self, encode_dim, z_dim, y_dim=0):
         super().__init__()
         self.z_dim = z_dim
         self.y_dim = y_dim
         self.net = nn.Sequential(
-            nn.Linear(3887 + y_dim, 300),
+            nn.Linear(encode_dim + y_dim, 300),
             nn.ELU(),
             nn.Linear(300, 300),
             nn.ELU(),
@@ -25,7 +25,7 @@ class Encoder(nn.Module):
         return m, v
 
 class Decoder(nn.Module):
-    def __init__(self, z_dim, y_dim=0):
+    def __init__(self, encode_dim, z_dim, y_dim=0):
         super().__init__()
         self.z_dim = z_dim
         self.y_dim = y_dim
@@ -34,7 +34,7 @@ class Decoder(nn.Module):
             nn.ELU(),
             nn.Linear(300, 300),
             nn.ELU(),
-            nn.Linear(300, 3887)
+            nn.Linear(300, encode_dim)
         )
 
     def decode(self, z, y=None):

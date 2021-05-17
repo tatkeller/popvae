@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import linalg
 import os
 import shutil
 # import tensorflow as tf
@@ -8,6 +9,9 @@ from codebase.models.ssvae import SSVAE
 from codebase.models.vae import VAE
 from torch.nn import functional as F
 from torchvision import datasets, transforms
+import matplotlib.pyplot as plt 
+import matplotlib as mpl
+
 
 bce = torch.nn.BCEWithLogitsLoss(reduction='none')
 
@@ -143,6 +147,20 @@ def log_bernoulli_with_logits(x, logits):
     log_prob = -bce(input=logits, target=x).sum(-1)
     return log_prob
 
+def log_bernoulli_with_logits_sigmoid(x, logits):
+    """
+    Computes the log probability of a Bernoulli given its logits
+
+    Args:
+        x: tensor: (batch, dim): Observation
+        logits: tensor: (batch, dim): Bernoulli logits
+
+    Return:
+        log_prob: tensor: (batch,): log probability of each sample
+    """
+    log_prob = -bce(input=logits, target=x).sum(-1)
+    return log_prob
+
 
 def kl_cat(q, log_q, log_p):
     """
@@ -235,6 +253,7 @@ def load_model_by_name(model, global_step):
     file_path = os.path.join('checkpoints',
                              model.name,
                              'model-{:05d}.pt'.format(global_step))
+    print(file_path)
     state = torch.load(file_path)
     model.load_state_dict(state)
     print("Loaded from {}".format(file_path))
@@ -467,6 +486,41 @@ def gumbel_softmax(logits, tau, eps=1e-8):
     y = logits + gumbel
     y = F.softmax(y / tau, dim=1)
     return y
+
+from matplotlib.patches import Ellipse
+
+def draw_ellipse(position, covariance, ax=None, **kwargs):
+    """Draw an ellipse with a given position and covariance"""
+    ax = ax or plt.gca()
+    
+    # # Convert covariance to principal axes
+    # U, s, Vt = np.linalg.svd(covariance)
+    # angle = np.degrees(np.arctan2(U[1, 0], U[0, 0]))
+    # width, height = 2 * np.sqrt(s)
+    
+    # # Draw the Ellipse
+    # for nsig in range(1, 4):
+    #     e = Ellipse(position, nsig * width, nsig * height, angle, **kwargs)
+    #     print(e)
+    #     ax.add_patch(e)
+        
+    v, w = linalg.eigh(covariance)
+    v = 2. * np.sqrt(2.) * np.sqrt(v)
+    u = w[0] / linalg.norm(w[0])
+    # as the DP will not use every component it has access to
+    # unless it needs it, we shouldn't plot the redundant
+    # components.
+
+    # Plot an ellipse to show the Gaussian component
+    angle = np.arctan(u[1] / u[0])
+    angle = 180. * angle / np.pi  # convert to degrees
+    ell = mpl.patches.Ellipse(position, v[0], v[1], 180. + angle, **kwargs) #color
+    ax.add_patch(ell)
+    # ell.set_clip_box(splot.bbox)
+    # ell.set_alpha(0.5)
+    # splot.add_artist(ell)
+
+
 
 
 class FixedSeed:

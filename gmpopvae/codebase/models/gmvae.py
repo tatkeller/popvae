@@ -6,14 +6,19 @@ from torch import nn
 from torch.nn import functional as F
 
 class GMVAE(nn.Module):
-    def __init__(self, nn='v1', z_dim=2, k=500, name='gmvae'):
+    def __init__(self, nn='v1', encode_dim = None, z_dim=2, k=500, name='gmvae'):
         super().__init__()
         self.name = name
         self.k = k
         self.z_dim = z_dim
-        nn = getattr(nns, nn)
-        self.enc = nn.Encoder(self.z_dim)
-        self.dec = nn.Decoder(self.z_dim)
+        if nn == 'popv':
+            nn = getattr(nns, nn)
+            self.enc = nn.Encoder(encode_dim, self.z_dim)
+            self.dec = nn.Decoder(encode_dim, self.z_dim)
+        else:
+            nn = getattr(nns, nn)
+            self.enc = nn.Encoder(self.z_dim)
+            self.dec = nn.Decoder(self.z_dim)
 
         # Mixture of Gaussians prior
         self.z_pre = torch.nn.Parameter(torch.randn(1, 2 * self.k, self.z_dim)
@@ -160,3 +165,9 @@ class GMVAE(nn.Module):
 
     def sample_x_given(self, z):
         return torch.bernoulli(self.compute_sigmoid_given(z))
+
+    def get_priors(self):
+        return ut.gaussian_parameters(self.z_pre, dim=1)
+    
+    def get_weights(self):
+        return self.pi

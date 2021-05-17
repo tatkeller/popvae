@@ -1,6 +1,7 @@
 #make a bokeh scatterplot from popvae output
 import bokeh, pandas as pd, numpy as np
 from bokeh import models, plotting, io, palettes, transform
+from bokeh.models import ColorBar
 import argparse
 
 parser=argparse.ArgumentParser()
@@ -36,7 +37,7 @@ p = bokeh.plotting.figure(plot_width=900, plot_height=600,
                           y_axis_label='LD2')
 
 if not colorby==None:
-    cmap = transform.linear_cmap(field_name = colorby, palette = palettes.Cividis[256], low = ld[colorby].min(), high = ld[colorby].max())
+    cmap = transform.linear_cmap(field_name = colorby, palette = palettes.Viridis[256], low = ld[colorby].min(), high = ld[colorby].max())
     # pal = palettes.cividis(len(pd.factorize(ld[colorby])[1]))
     #pal=["#A6CEE3","#1F78B4","#B2DF8A","#33A02C","#FB9A99","#E31A1C",
     #     "#FDBF6F","#FF7F00","#CAB2D6","#6A3D9A","#FFFF99","#B15928",
@@ -48,6 +49,8 @@ if not colorby==None:
         p.circle(x='mean1',y='mean2',size=7,alpha=0.75,
                  source=bokeh.models.ColumnDataSource(group),
                  color=cmap)#,legend=key)
+    color_bar = ColorBar(color_mapper=cmap['transform'], label_standoff=12)
+    p.add_layout(color_bar, 'right')
 else:
     p.circle(x="mean1",y="mean2",size=7,alpha=0.75,source=ld,color="black")
 
